@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from lxml import etree
+from bs4 import BeautifulSoup
 
 import requests
 import json
@@ -28,8 +29,17 @@ def call_edinet_api(request):
 
             file = os.getcwd() + "\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
             data = get_information_about_officers_text(file)
-            print(data.text)
-            
+            soup = BeautifulSoup(data.text)
+
+            for table in soup.find_all("table"):
+                for tr in table.find_all_next("tr"):
+
+                    if len(tr.find_all("td")) > 7:
+                        for child in tr.children:
+                            if child.name == "td":
+                                print(child.get_text().replace('\n', '/'))
+                                print("-------------------------------------") 
+                               
     return render(request, 'edinet/corporate_officer_list.html', {})
 
 def get_information_about_officers_text(file):
