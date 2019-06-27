@@ -1,15 +1,19 @@
 from django.shortcuts import render
 from lxml import etree
 from bs4 import BeautifulSoup
+from edinet.models import CorporateOfficer
 
 import requests
 import json
 import zipfile
 import io
 import os
+import re
 
 list_api = "https://disclosure.edinet-fsa.go.jp/api/v1/documents.json?date={target}&type=2"
 file_api = "https://disclosure.edinet-fsa.go.jp/api/v1/documents/{document_id}?type=1"
+number_translate_dictionary = {"０":"0","１":"1","２":"2","３":"3","４":"4","５":"5","６":"6","７":"7","８":"8","９":"9"}
+trans_table = str.maketrans(number_translate_dictionary)
 
 def corporate_officer_list(request):
     return render(request, 'edinet/corporate_officer_list.html', {})
@@ -31,16 +35,100 @@ def call_edinet_api(request):
             data = get_information_about_officers_text(file)
             soup = BeautifulSoup(data.text)
 
-            for table in soup.find_all("table"):
-                for tr in table.find_all_next("tr"):
+            corporate_officer_list = get_corporate_officer_list(soup) 
 
-                    if len(tr.find_all("td")) > 7:
-                        for child in tr.children:
-                            if child.name == "td":
-                                print(child.get_text().replace('\n', '/'))
-                                print("-------------------------------------") 
+            for corporate_officer in corporate_officer_list:
+                print("-------------")
+                print("【役名】")
+                print(corporate_officer.position)
+                print("【職名】")
+                print(corporate_officer.job)
+                print("【氏名】")
+                print(corporate_officer.name)
+                print("【生年月日】")
+                print(corporate_officer.birthday)
+                print("【経歴】")
+                print(corporate_officer.biography)
+                print("【任期】")
+                print(corporate_officer.term)
+                print("【株式数】")
+                print(corporate_officer.stock)              
+
                                
     return render(request, 'edinet/corporate_officer_list.html', {})
+
+def get_corporate_officer_list(soup):
+
+    corporate_officer_list = list()
+
+    for table in soup.find_all("table"):
+        for tr in table.find_all_next("tr"):
+
+            column_value_list = list()
+
+            if len(tr.find_all("td")) > 7:
+                for child in tr.children:
+                    if child.name == "td":
+                        column_value_list.append(child.get_text().replace('\n', '/'))
+
+            if len(column_value_list) > 0:
+                corporate_officer = create_corporate_officer(column_value_list)
+                corporate_officer_list.append(corporate_officer)
+    
+    return corporate_officer_list
+
+def create_corporate_officer(column_value_list):
+    corporate_officer = CorporateOfficer()
+
+    if len(column_value_list) > 0:
+        corporate_officer.position = process_item(column_value_list[0]).replace("/","")
+    
+    if len(column_value_list) > 1:
+        corporate_officer.job = process_item(column_value_list[1]).replace("/","")
+    
+    if len(column_value_list) > 2:
+        corporate_officer.name = process_item(column_value_list[2])
+    
+    if len(column_value_list) > 3:
+        corporate_officer.birthday = process_item(column_value_list[3])
+    
+    if len(column_value_list) > 4:
+        corporate_officer.biography = get_biography_value(column_value_list)
+    
+    if len(column_value_list) > 5:
+        corporate_officer.term = process_item(column_value_list[5])
+    
+    if len(column_value_list) > 6:
+        corporate_officer.stock = process_item(column_value_list[6])
+    
+    return corporate_officer
+
+def get_biography_value(column_value_list):
+    biography = process_item(column_value_list[4])
+    biography_list = biography.split("/")
+
+    number = 1
+    value = ""
+    for target in biography_list:
+        if target.strip() != "":
+            if re.search("[0-9]",target):
+                number = 1
+
+                if value.strip() != "":
+                    value += "\n"
+
+            if number == 1:
+                value += target + " "
+                number += 1
+                continue
+
+            if number == 2:
+                value += target
+                continue
+    return value
+
+def process_item(item):
+    return item.translate(trans_table).strip("/")
 
 def get_information_about_officers_text(file):
     root = read_xml_lxml_etree(file)
