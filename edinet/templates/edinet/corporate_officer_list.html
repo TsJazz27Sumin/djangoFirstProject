@@ -13,19 +13,53 @@
   <body class="text-center">
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 
-  <main role="main" class="inner cover">
-    <h1 class="cover-heading">Call Edinet API.</h1>
-    <p class="lead">This is My Django Practice.</p>
-    <p class="lead">
-      <a href="{% url 'call_edinet_api' %}" class="btn btn-lg btn-secondary">Click</a>
-    </p>
-  </main>
+      <main role="main" class="inner cover">
+        <h1 class="cover-heading">Call Edinet API.</h1>
+        <p class="lead">This is My Django Practice.</p>
+        <p class="lead">
+          <a href="{% url 'call_edinet_api' %}" class="btn btn-lg btn-secondary">Click</a>
+        </p>
+      </main>
 
-  <footer class="mastfoot mt-auto">
-    <div class="inner">
-      <p>@TsJazz27Sumin 2019.</p>
+      {% block content %}
+      {% if corporate_officer_list_count == 0 %}
+        No Data
+      {% endif %}
+      {% if corporate_officer_list_count > 0 %}
+      <table class="table table-bordered table-striped table-dark">
+        <thead>
+            <tr>
+                <th>役名</th>
+                <th>職名</th>
+                <th>氏名</th>
+                <th>生年月日</th>
+                <th>経歴</th>
+                <th>任期</th>
+                <th>株式数</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for corporate_officer in corporate_officer_list %}
+            <tr>
+                <td>{{corporate_officer.position}}</td>
+                <td>{{corporate_officer.job}}</td>
+                <td>{{corporate_officer.name}}</td>
+                <td>{{corporate_officer.birthday}}</td>
+                <td>{{corporate_officer.biography | linebreaks }}</td>
+                <td>{{corporate_officer.term}}</td>
+                <td>{{corporate_officer.stock}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      {% endblock %}
+      
+      <footer class="mastfoot mt-auto">
+        <div class="inner">
+          <p>@TsJazz27Sumin 2019.</p>
+        </div>
+      </footer>
     </div>
-  </footer>
-</div>
-</body>
+  </body>
 </html>

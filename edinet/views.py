@@ -16,11 +16,10 @@ number_translate_dictionary = {"０":"0","１":"1","２":"2","３":"3","４":"4"
 trans_table = str.maketrans(number_translate_dictionary)
 
 def corporate_officer_list(request):
-    return render(request, 'edinet/corporate_officer_list.html', {})
+    context = {'corporate_officer_list': list(), 'corporate_officer_list_count': 0}
+    return render(request, 'edinet/corporate_officer_list.html', context)
 
 def call_edinet_api(request):
-
-    print(os.getcwd())
 
     for result in get_results("2018-06-19"):
         if result["edinetCode"] == "E01777" and "有価証券" in result["docDescription"]:
@@ -35,27 +34,11 @@ def call_edinet_api(request):
             data = get_information_about_officers_text(file)
             soup = BeautifulSoup(data.text)
 
-            corporate_officer_list = get_corporate_officer_list(soup) 
+            corporate_officer_list = get_corporate_officer_list(soup)          
 
-            for corporate_officer in corporate_officer_list:
-                print("-------------")
-                print("【役名】")
-                print(corporate_officer.position)
-                print("【職名】")
-                print(corporate_officer.job)
-                print("【氏名】")
-                print(corporate_officer.name)
-                print("【生年月日】")
-                print(corporate_officer.birthday)
-                print("【経歴】")
-                print(corporate_officer.biography)
-                print("【任期】")
-                print(corporate_officer.term)
-                print("【株式数】")
-                print(corporate_officer.stock)              
-
+    context = {'corporate_officer_list': corporate_officer_list, 'corporate_officer_list_count': len(corporate_officer_list)}
                                
-    return render(request, 'edinet/corporate_officer_list.html', {})
+    return render(request, 'edinet/corporate_officer_list.html', context)
 
 def get_corporate_officer_list(soup):
 
@@ -87,7 +70,7 @@ def create_corporate_officer(column_value_list):
         corporate_officer.job = process_item(column_value_list[1]).replace("/","")
     
     if len(column_value_list) > 2:
-        corporate_officer.name = process_item(column_value_list[2])
+        corporate_officer.name = process_item(column_value_list[2]).replace("/","")
     
     if len(column_value_list) > 3:
         corporate_officer.birthday = process_item(column_value_list[3])
