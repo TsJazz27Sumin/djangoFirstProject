@@ -30,7 +30,7 @@ def call_edinet_api(request):
             zip = zipfile.ZipFile(io.BytesIO(r.content))
             zip.extractall()
 
-            file = os.getcwd() + "\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
+            file = os.getcwd() + r"\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
             data = get_information_about_officers_text(file)
             soup = BeautifulSoup(data.text)
 
@@ -42,7 +42,7 @@ def call_edinet_api(request):
 
 def reload(request):
 
-    file = os.getcwd() + "\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
+    file = os.getcwd() + r"\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
     data = get_information_about_officers_text(file)
     soup = BeautifulSoup(data.text)
     corporate_officer_list = get_corporate_officer_list(soup)  
