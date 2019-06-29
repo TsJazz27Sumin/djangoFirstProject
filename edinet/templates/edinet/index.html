@@ -1,0 +1,43 @@
+{% load static %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% block extrahead %}
+  <link href="{% static 'css/edinet.css' %}" rel="stylesheet">
+  <script type="text/javascript" src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/edinet.js' %}"></script>
+{% endblock %}
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Call Edinet API</title>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+
+      <main role="main" class="inner cover">
+        <h1 class="cover-heading">Call Edinet API.</h1>
+        <p class="lead">This is My Django Practice.</p>
+        <p class="lead">
+          <a href="{% url 'call_edinet_api' %}" class="btn btn-lg btn-primary">Click</a>
+          <a href="{% url 'reload' %}" class="btn btn-lg btn-secondary">Reload</a>
+          <a id="try-ajax" name="{% url 'try_ajax' %}" href="" class="btn btn-lg btn-info">Try Ajax</a>
+        </p>
+      </main>
+
+      <div id="result">
+        <p>No Data<p>
+      </div>
+      
+      <footer class="mastfoot mt-auto">
+        <div class="inner">
+          <p>@TsJazz27Sumin 2019.</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+  

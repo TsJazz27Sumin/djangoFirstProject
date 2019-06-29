@@ -2,6 +2,8 @@ from django.shortcuts import render
 from lxml import etree
 from bs4 import BeautifulSoup
 from edinet.models import CorporateOfficer
+from django.http.response import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 import requests
 import json
@@ -9,15 +11,19 @@ import zipfile
 import io
 import os
 import re
+import json
 
 list_api = "https://disclosure.edinet-fsa.go.jp/api/v1/documents.json?date={target}&type=2"
 file_api = "https://disclosure.edinet-fsa.go.jp/api/v1/documents/{document_id}?type=1"
 number_translate_dictionary = {"０":"0","１":"1","２":"2","３":"3","４":"4","５":"5","６":"6","７":"7","８":"8","９":"9"}
 trans_table = str.maketrans(number_translate_dictionary)
 
-def corporate_officer_list(request):
-    context = {'corporate_officer_list': list(), 'corporate_officer_list_count': 0}
-    return render(request, 'edinet/corporate_officer_list.html', context)
+def index(request):
+    return render(request, 'edinet/index.html', {})
+
+def try_ajax(request):
+    data = {"message" : "Success"}
+    return JsonResponse(data)
 
 def call_edinet_api(request):
 
