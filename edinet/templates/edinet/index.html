@@ -28,9 +28,42 @@
         </p>
       </main>
 
-      <div id="result">
-        <p>No Data<p>
+      {% block content %}
+      {% if corporate_officer_list_count == 0 %}
+        No Data
+      {% endif %}
+      {% if corporate_officer_list_count > 0 %}
+      <p class="lead">list_count = {{corporate_officer_list_count}}</p>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped table-dark edinet-table">
+          <thead>
+            <tr>
+              <th class="position">役名</th>
+              <th class="job">職名</th>
+              <th class="name">氏名</th>
+              <th class="birthday">生年月日</th>
+              <th class="biography">経歴</th>
+              <th class="term">任期</th>
+              <th class="stock">株式数</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for corporate_officer in corporate_officer_list %}
+              <tr>
+                <td class="position">{{corporate_officer.position}}</td>
+                <td class="job">{{corporate_officer.job}}</td>
+                <td class="name">{{corporate_officer.name}}</td>
+                <td class="birthday">{{corporate_officer.birthday}}</td>
+                <td class="biography">{{corporate_officer.biography | linebreaks }}</td>
+                <td class="term">{{corporate_officer.term}}</td>
+                <td class="stock">{{corporate_officer.stock}}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+        </table>
       </div>
+      {% endif %}
+      {% endblock %}
       
       <footer class="mastfoot mt-auto">
         <div class="inner">
@@ -40,4 +73,3 @@
     </div>
   </body>
 </html>
-  

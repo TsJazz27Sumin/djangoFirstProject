@@ -19,7 +19,8 @@ number_translate_dictionary = {"０":"0","１":"1","２":"2","３":"3","４":"4"
 trans_table = str.maketrans(number_translate_dictionary)
 
 def index(request):
-    return render(request, 'edinet/index.html', {})
+    context = {'corporate_officer_list': list(), 'corporate_officer_list_count': 0}                               
+    return render(request, 'edinet/index.html', context)
 
 def try_ajax(request):
     data = {"message" : "Success"}
@@ -44,7 +45,7 @@ def call_edinet_api(request):
 
     context = {'corporate_officer_list': corporate_officer_list, 'corporate_officer_list_count': len(corporate_officer_list)}
                                
-    return render(request, 'edinet/corporate_officer_list.html', context)
+    return render(request, 'edinet/index.html', context)
 
 def reload(request):
 
@@ -55,7 +56,7 @@ def reload(request):
     
     context = {'corporate_officer_list': corporate_officer_list, 'corporate_officer_list_count': len(corporate_officer_list)}
                                
-    return render(request, 'edinet/corporate_officer_list.html', context)
+    return render(request, 'edinet/index.html', context)
 
 def get_corporate_officer_list(soup):
 
