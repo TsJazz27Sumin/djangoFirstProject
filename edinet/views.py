@@ -40,23 +40,38 @@ def call_edinet_api(request):
                                
     return render(request, 'edinet/corporate_officer_list.html', context)
 
+def reload(request):
+
+    file = os.getcwd() + "\XBRL\PublicDoc\jpcrp030000-asr-001_E01777-000_2018-03-31_01_2018-06-19.xbrl"
+    data = get_information_about_officers_text(file)
+    soup = BeautifulSoup(data.text)
+    corporate_officer_list = get_corporate_officer_list(soup)  
+    
+    context = {'corporate_officer_list': corporate_officer_list, 'corporate_officer_list_count': len(corporate_officer_list)}
+                               
+    return render(request, 'edinet/corporate_officer_list.html', context)
+
 def get_corporate_officer_list(soup):
 
     corporate_officer_list = list()
 
     for table in soup.find_all("table"):
-        for tr in table.find_all_next("tr"):
+        for tableChild in table.children:
 
-            column_value_list = list()
+            if tableChild.name == "tbody":
+                for tr in tableChild.children:
 
-            if len(tr.find_all("td")) > 7:
-                for child in tr.children:
-                    if child.name == "td":
-                        column_value_list.append(child.get_text().replace('\n', '/'))
+                    if tr.name == "tr":
+                        column_value_list = list()
 
-            if len(column_value_list) > 0:
-                corporate_officer = create_corporate_officer(column_value_list)
-                corporate_officer_list.append(corporate_officer)
+                        if len(tr.find_all("td")) > 7:
+                            for trChild in tr.children:
+                                if trChild.name == "td":
+                                    column_value_list.append(trChild.get_text().replace('\n', '/'))
+
+                        if len(column_value_list) > 0:
+                            corporate_officer = create_corporate_officer(column_value_list)
+                            corporate_officer_list.append(corporate_officer)
     
     return corporate_officer_list
 
